@@ -1,0 +1,80 @@
+https://xakep.ru/2017/03/07/cryptolockers/
+https://rinseandrepeatanalysis.blogspot.com/2018/08/reversing-cerber-raas.html
+
+Запуск файла Microsoft Office с расширением .dotm содержащим макрос
+
+Создание файлов
+    AppData\Local\Temp\floppy_disk.png
+    AppData\Local\Temp\floppy_disk_disabled.png
+    AppData\Local\Temp\flat.xsl
+    AppData\Local\Temp\Diacid.cpmO
+    AppData\Local\Temp\nsmAD93.tmp\System.dll
+    AppData\Local\Temp\collages.dll
+
+Изменения в реестре
+    https://1.bp.blogspot.com/-8mXNzFAtnBo/W2hQJzbnF9I/AAAAAAAABk8/_f-JNng-B3w4trjPML_vUK0P90z51c0dwCEwYBhgL/s1600/regset.PNG
+
+
+Внедряетсся в explorer.exe
+
+Запускает
+    adaptertroubleshooter.exe
+    bthudtask.exe (задание по деинсталляции устройства Bluetooth,
+        которое часто запускается вымогателями)
+
+Загружает файл DLL (System.dll например)
+
+Запускает шифрование (Файлы шифруются с помощью алгоритмов AES-265 и RSA)
+    Расширение рандомное, примеры - '.94d4', '.bde6'
+
+Удаляет теневые копии
+
+Вносит изменения в процесс загрузки
+
+Также запускает сетевой поиск, обращаясь к очень большому количеству IP-адресов, которые находятся преимущественно во Франции.
+
+Cerber отображает свое сообщение с требованием выкупа с помощью программ
+    «Блокнот»
+    Google Chrome
+    Через файл Desktop\_HELP_DECRYPT_N0BR8ST0_.hta
+
+Завершив работу - самоудаляется
+
+Host-based IOCs:
+    cerber.exe
+    2d6ace7910f84eb775272a6590453a0e - md5
+    \AppData\Local\Temp\collages.dll
+    2A4BF3D01B6C84A2130C110D02C772AC - md5
+    \AppData\Local\Temp\floppy_disk.png
+    \AppData\Local\Temp\floppy_disk_disabled.png
+    \AppData\Local\Temp\flat.xsl
+    \AppData\Local\Temp\tmpCBD8.bmp
+    \AppData\Local\Temp\0ad3e319\4f11.tmp
+    \AppData\Local\Temp\0ad3e319\280c.tmp
+    \AppData\Local\Temp\nshBD76.tmp\System.dll
+    3E6BF00B3AC976122F982AE2AADB1C51 - md5
+    \Desktop\_HELP_DECRYPT_N0BR8ST0_.hta - Ransom note
+    \Desktop\_HELP_DECRYPT_N0BR8ST0_.jpg - Wallpaper
+    *.94d4 - file extension tagged onto encrypted files (randomly generated)
+    *.bde6 - file extension tagged onto encrypted files (randomly generated)
+    *.[a-z0-9]{4} - regex for file extension
+    shell.{FB79CB8E-F0B4-4B09-A183-601B6025EC35} - Mutex
+    \Sessions\1\BaseNamedObjects\SM0:6064:168:WilStaging_02 - Based named object
+    HKEY_CURRENT_USER\Control Panel\Desktop\WallPaper -REG_SZ - C:\Users\REM\AppData\Local\Temp\tmpCBD8.bmp
+
+Hard-coded Public Key:
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvkty5qhqEydR9076Fevp
+0uMP7IZNms1AA7GPQUThMWbYiEYIhBKcT0/nwYrBq0Ogv79K1tta04EHTrXgcAp/
+OJgBhz9N58aewd4yZBm2coeaDGvcGRAc9e72ObFQ/TME/Io7LZ5qXDWzDafI8LA8
+JQmSz0L+/G+LPTWg7kPOpJT7WSkRb9T8w5QgZRJuvvhErHM83kO3ELTH+SoEI53p
+4ENVwfNNEpOpnpOOSKQobtIw56CsQFrhac0sQlOjek/muVluxjiEmc0fszk2WLSn
+qryiMyzaI5DWBDjYKXA1tp2h/ygbkYdFYRbAEqwtLxT2wMfWPQI5OkhTa9tZqD0H
+nQIDAQAB
+-----END PUBLIC KEY-----
+
+Network-based IOCs:
+    97.15.12.xxx:6892 - UDP
+    91.239.24.xxx: 6892 - UDP
+    xxx.12.15.97: 6892 - UDP
+    xxx.24.239.91: 6892 - UDP
