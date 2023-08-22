@@ -1,0 +1,4 @@
+﻿  CB2.0.cpp
+D:\VM\temp\TEMP_RO\RW\HelloThere-main\CerberF\CB2.0\CB2.0.cpp(41,60): warning C4129: .: неизвестная escape-последовательность
+MSVCRT.lib(exe_main.obj) : error LNK2001: неразрешенный внешний символ _main.
+D:\VM\temp\TEMP_RO\RW\HelloThere-main\CerberF\CB2.0\Release\CB2.0.exe : fatal error LNK1120: неразрешенных внешних элементов: 1

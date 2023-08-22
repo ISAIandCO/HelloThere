@@ -1,3 +1,4 @@
 C:\Users\nikit\source\repos\ISAIandCO\HelloThere\CerberF\CB2.0\x64\Release\CB2.0.exe
 F:\Soft\Codes\GH\CB2.0\x64\Release\CB2.0.exe
 C:\Temp\CB2.0\x64\Release\CB2.0.exe
+D:\VM\temp\TEMP_RO\RW\HelloThere-main\CerberF\CB2.0\x64\Release\CB2.0.exe
