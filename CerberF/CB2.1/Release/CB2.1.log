@@ -1,6 +1,8 @@
-﻿  Создание кода
-  0 of 222 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+﻿  CB2.1.cpp
+F:\Soft\Codes\GH\HelloThere\CerberF\CB2.1\CB2.1.cpp(42,108): warning C4129: .: неизвестная escape-последовательность
+  Создание кода
+  8 of 221 functions ( 3.6%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Создание кода завершено
-  CB2.1.vcxproj -> D:\VM\temp\TEMP_RO\RW\HelloThere-main\CerberF\CB2.1\Release\CB2.1.exe
+  CB2.1.vcxproj -> F:\Soft\Codes\GH\HelloThere\CerberF\CB2.1\Release\CB2.1.exe
